@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice Recorder for Bingo</title>
+</head>
+<body>
+    <h2>Record Bingo Calls</h2>
+    <div id="currentCall"></div>
+    <button id="recordBtn">Start Recording</button>
+    <button id="stopBtn" disabled>Stop Recording</button>
+    <button id="nextBtn" disabled>Next Call</button>
+    <audio id="playback" controls style="display:none;"></audio>
+    
+    <script>
+        const bingoNumbers = [];
+        for(let i = 1; i <= 15; i++) bingoNumbers.push({letter: 'B', number: i, index: i});
+        for(let i = 16; i <= 30; i++) bingoNumbers.push({letter: 'I', number: i, index: i});
+        for(let i = 31; i <= 45; i++) bingoNumbers.push({letter: 'N', number: i, index: i});
+        for(let i = 46; i <= 60; i++) bingoNumbers.push({letter: 'G', number: i, index: i});
+        for(let i = 61; i <= 75; i++) bingoNumbers.push({letter: 'O', number: i, index: i});
+        
+        let currentIndex = 0;
+        let mediaRecorder;
+        let chunks = [];
+        
+        function updateDisplay() {
+            const current = bingoNumbers[currentIndex];
+            document.getElementById('currentCall').innerHTML = 
+                `<h3>Record: ${current.letter}-${current.number} (${currentIndex + 1}/75)</h3>`;
+        }
+        
+        document.getElementById('recordBtn').onclick = async () => {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            chunks = [];
+            
+            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'audio/wav' });
+                const url = URL.createObjectURL(blob);
+                
+                const playback = document.getElementById('playback');
+                playback.src = url;
+                playback.style.display = 'block';
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `amharic-${bingoNumbers[currentIndex].index}.wav`;
+                a.click();
+                
+                document.getElementById('nextBtn').disabled = false;
+            };
+            
+            mediaRecorder.start();
+            document.getElementById('recordBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+        };
+        
+        document.getElementById('stopBtn').onclick = () => {
+            mediaRecorder.stop();
+            document.getElementById('recordBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+        };
+        
+        document.getElementById('nextBtn').onclick = () => {
+            currentIndex++;
+            if(currentIndex >= bingoNumbers.length) {
+                document.getElementById('currentCall').innerHTML = '<h3>All recordings complete!</h3>';
+                document.getElementById('recordBtn').disabled = true;
+                document.getElementById('nextBtn').disabled = true;
+                return;
+            }
+            updateDisplay();
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('playback').style.display = 'none';
+        };
+        
+        updateDisplay();
+    </script>
+</body>
+</html>

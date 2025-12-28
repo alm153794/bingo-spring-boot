@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Paste Bingo Sounds</title>
+    <style>
+        .drop-zone {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            width: 100%;
+            height: 200px;
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+        .drop-zone.dragover {
+            border-color: #007cba;
+            background-color: #f0f8ff;
+        }
+        .file-list {
+            margin: 20px 0;
+        }
+        .file-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <h2>Paste/Upload Bingo Audio Files</h2>
+    
+    <div class="drop-zone" id="dropZone">
+        <p>Drag and drop audio files here or click to select files</p>
+        <p>Files will be automatically renamed to amharic-1.aac, amharic-2.aac, etc.</p>
+    </div>
+    
+    <input type="file" id="fileInput" multiple accept="audio/*" style="display: none;">
+    
+    <div class="file-list" id="fileList"></div>
+    
+    <button onclick="downloadAll()" id="downloadBtn" style="display: none;">Download All Files</button>
+
+    <script>
+        let fileCounter = 1;
+        let processedFiles = [];
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        
+        dropZone.addEventListener('click', () => fileInput.click());
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+        
+        // Handle paste events
+        document.addEventListener('paste', (e) => {
+            const items = e.clipboardData.items;
+            for (let item of items) {
+                if (item.type.startsWith('audio/')) {
+                    const file = item.getAsFile();
+                    if (file) {
+                        handleFiles([file]);
+                    }
+                }
+            }
+        });
+        
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('audio/')) {
+                    processFile(file);
+                }
+            });
+        }
+        
+        function processFile(file) {
+            const newName = `amharic-${fileCounter}.aac`;
+            const url = URL.createObjectURL(file);
+            
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <div>
+                    <strong>${newName}</strong> (Original: ${file.name})
+                    <br><audio controls src="${url}"></audio>
+                </div>
+                <button onclick="downloadFile('${url}', '${newName}')">Download</button>
+            `;
+            
+            fileList.appendChild(fileItem);
+            
+            processedFiles.push({ url, name: newName, originalName: file.name });
+            fileCounter++;
+            
+            document.getElementById('downloadBtn').style.display = 'block';
+        }
+        
+        function downloadFile(url, filename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+        }
+        
+        function downloadAll() {
+            processedFiles.forEach(file => {
+                downloadFile(file.url, file.name);
+            });
+        }
+    </script>
+</body>
+</html>

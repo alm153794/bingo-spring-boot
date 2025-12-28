@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Game</title>
+    <link rel="stylesheet" href="/css/bingo.css">
+</head>
+<body>
+    <h1>Bingo Game</h1>
+    
+    <div class="setup-controls">
+        <label for="cardCount">Number of Cards:</label>
+        <input type="number" id="cardCount" min="1" max="100" value="4">
+        <button id="generateBtn">Generate Cards</button>
+    </div>
+    
+    <div class="game-controls" style="display:none;">
+        <button id="playBtn">Play</button>
+        <button id="pauseBtn" style="display:none;">Pause</button>
+        <button id="resumeBtn" style="display:none;">Resume</button>
+        <button id="resetBtn">Reset</button>
+        <div id="currentNumber">Click Play to Start!</div>
+    </div>
+    
+    <div id="winnerAlert" style="display:none;"></div>
+    
+    <div id="cardsContainer"></div>
+    
+    <div id="calledNumbers" style="display:none;">
+        <h3>Called Numbers:</h3>
+        <div id="numbersByLetter">
+            <div class="letter-group">
+                <h4>B</h4>
+                <div id="B-numbers"></div>
+            </div>
+            <div class="letter-group">
+                <h4>I</h4>
+                <div id="I-numbers"></div>
+            </div>
+            <div class="letter-group">
+                <h4>N</h4>
+                <div id="N-numbers"></div>
+            </div>
+            <div class="letter-group">
+                <h4>G</h4>
+                <div id="G-numbers"></div>
+            </div>
+            <div class="letter-group">
+                <h4>O</h4>
+                <div id="O-numbers"></div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="numberSound" preload="auto">
+        <source type="audio/aac">
+        <source type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <audio id="letterSound" preload="auto"></audio>
+
+    <script src="/js/bingo.js"></script>
+</body>
+</html>

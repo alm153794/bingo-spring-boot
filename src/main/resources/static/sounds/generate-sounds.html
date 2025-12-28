@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Bingo Sounds</title>
+</head>
+<body>
+    <h2>Bingo Sound Tester</h2>
+    <p>Test all 75 recorded Amharic bingo calls:</p>
+    
+    <button onclick="testAllSounds()">Test All 75 Sounds</button>
+    <div id="progress"></div>
+    <div id="bingoNumbers"></div>
+    <audio id="testAudio"></audio>
+
+    <script>
+        const bingoNumbers = [];
+        
+        // Generate B1-B15
+        for(let i = 1; i <= 15; i++) bingoNumbers.push({letter: 'B', number: i});
+        // Generate I16-I30
+        for(let i = 16; i <= 30; i++) bingoNumbers.push({letter: 'I', number: i});
+        // Generate N31-N45
+        for(let i = 31; i <= 45; i++) bingoNumbers.push({letter: 'N', number: i});
+        // Generate G46-G60
+        for(let i = 46; i <= 60; i++) bingoNumbers.push({letter: 'G', number: i});
+        // Generate O61-O75
+        for(let i = 61; i <= 75; i++) bingoNumbers.push({letter: 'O', number: i});
+        
+        document.getElementById('bingoNumbers').innerHTML = bingoNumbers.map(b => 
+            `<button onclick="playSound(${b.number})">${b.letter}-${b.number}</button>`
+        ).join(' ');
+        
+        function playSound(number) {
+            const audio = document.getElementById('testAudio');
+            audio.src = `numbers/amharic-${number}.aac`;
+            audio.play().catch(e => console.log(`Error playing amharic-${number}.aac:`, e));
+        }
+        
+        function testAllSounds() {
+            let current = 0;
+            const progress = document.getElementById('progress');
+            
+            function playNext() {
+                if(current >= bingoNumbers.length) {
+                    progress.innerHTML = 'All sounds tested!';
+                    return;
+                }
+                
+                const b = bingoNumbers[current];
+                progress.innerHTML = `Testing ${b.letter}-${b.number} (${current + 1}/75)...`;
+                playSound(b.number);
+                current++;
+                setTimeout(playNext, 2000);
+            }
+            
+            playNext();
+        }
+    </script>
+</body>
+</html>
